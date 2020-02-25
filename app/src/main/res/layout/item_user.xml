@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="user"
+            type="com.example.tochkaapp.data.model.GithubUser" />
+
+        <variable
+            name="view_model"
+            type="com.example.tochkaapp.screen.users.UsersListViewModel" />
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="12dp"
+        android:layout_margin="@dimen/default_small_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/default_large_margin">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/user_avatar_image_view"
+                android:layout_width="@dimen/avatar_width"
+                android:layout_height="@dimen/avatar_height"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/user_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{user.name}"
+                android:textColor="@color/blackText"
+                android:textSize="@dimen/medium_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/user_avatar_image_view"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Vasiliy Aleksandrovich Shur" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Tochka App</string>
+    <string name="login_via_google">Login via Google</string>
+    <string name="google_auth_secret">vpu87-7gugamrOHzR5MogxVC</string>
+    <string name="no_users_text">No users found :(</string>
+    <string name="retry">Retry</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Username...</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#8a000000</color>
+    <color name="colorAccent">#e5000000</color>
+
+    <color name="blackText">#e5000000</color>
+    <color name="grayText">#8a000000</color>
+    <color name="main_background">#FFFFFF</color>
+
+    <color name="google_red_color">#DD4B39</color>
+
+
+</resources>
