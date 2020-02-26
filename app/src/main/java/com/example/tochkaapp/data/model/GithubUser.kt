@@ -14,8 +14,6 @@ data class GithubUser(
 
     var avatarUrl: String,
 
-    var repositoriesUrl: String,
-
-    var starredUrl: String
+    var profileUrl: String
 
 ) : Serializable

@@ -48,16 +48,11 @@ class GitHubUsersRepository(
 
     override fun observeLoading(): LiveData<LoadingState> = loadingState
 
- /*   fun getPagedList(): PagedList<GithubUser> {
-        val allUsersDataSource = GithubAllUsersDataSource(compositeDisposable, githubApi, mapper)
-        val pagedList: PagedList<GithubUser> = PagedList.Builder(allUsersDataSource, pagedListConfig).build()
-        return pagedList
-    }*/
 
     private fun setupConfig() =
         PagedList.Config.Builder()
             .setEnablePlaceholders(false)
-            .setInitialLoadSizeHint(PAGE_SIZE * 2)
+            .setInitialLoadSizeHint(PAGE_SIZE)
             .setPageSize(PAGE_SIZE)
             .build()
 

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.tochkaapp.data.model.GithubUser
 import com.example.tochkaapp.databinding.ItemUserBinding
 import kotlinx.android.synthetic.main.item_user.view.*
@@ -26,7 +27,10 @@ internal class UserViewHolder private constructor(
         binding.root.user_avatar_image_view.transitionName = githubUser.avatarUrl
         binding.root.user_name_text_view.transitionName = githubUser.name
         binding.root.setOnClickListener { navigationListener.navigate(githubUser, binding) }
-        Glide.with(binding.root).load(githubUser.avatarUrl).circleCrop().into(binding.userAvatarImageView)
+        Glide.with(binding.root)
+            .load(githubUser.avatarUrl)
+            .apply(RequestOptions.circleCropTransform())
+            .into(binding.userAvatarImageView)
     }
 
     companion object {

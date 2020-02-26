@@ -7,8 +7,8 @@
 
 
     <!-- images -->
-    <dimen name="small_avatar_height">48dp</dimen>
-    <dimen name="small_avatar_width">48dp</dimen>
+    <dimen name="small_avatar_height">72dp</dimen>
+    <dimen name="small_avatar_width">72dp</dimen>
     <dimen name="big_avatar_height">184dp</dimen>
 
     <!-- text -->
@@ -18,5 +18,6 @@
 
     <!-- cardview -->
     <dimen name="item_card_view_corner_radius">12dp</dimen>
+    <dimen name="details_card_height">128dp</dimen>
 
 </resources>

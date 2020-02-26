@@ -29,15 +29,13 @@ class GithubUserMapper : UserMapper {
         val id = dtoUser.id
         val name = dtoUser.login
         val avatarUrl = dtoUser.avatarUrl
-        val repositoriesUrl = dtoUser.reposUrl
-        val starredUrl = dtoUser.starredUrl
-
+        val profileUrl = dtoUser.htmlUrl
         return GithubUser(
             id,
             name,
             avatarUrl,
-            repositoriesUrl,
-            starredUrl
+            profileUrl
+
         )
     }
 

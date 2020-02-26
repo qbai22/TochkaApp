@@ -6,6 +6,6 @@
     <string name="retry">Retry</string>
     <string name="search">Search</string>
     <string name="search_hint">Username...</string>
-    <string name="repositories">Repositories</string>
+    <string name="github_profile">Github profile</string>
     <string name="starred_projects">Starred Projects</string>
 </resources>

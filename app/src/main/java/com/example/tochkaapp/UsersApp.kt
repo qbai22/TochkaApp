@@ -10,7 +10,7 @@ import io.reactivex.plugins.RxJavaPlugins
 /**
  * Created by Vladimir Kraev
  */
-class UsersApp : Application() {
+class UsersApp: Application() {
 
     private lateinit var dataComponent: DataComponent
 
