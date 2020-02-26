@@ -7,6 +7,6 @@ import com.example.tochkaapp.data.model.GithubUser
  */
 
 /**
- * Class to observe navigation event to Login Screen
+ * Class to observe navigation event to User Details Screen
  */
 class NavigateToDetailsEvent(user: GithubUser) : Event<GithubUser>(user)

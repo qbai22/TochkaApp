@@ -1,6 +1,5 @@
 package com.example.tochkaapp.screen.users
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +17,6 @@ class UserViewHolder private constructor(private val binding: ItemUserBinding) :
     fun bindUser(viewModel: UsersListViewModel, user: GithubUser) {
         binding.viewModel = viewModel
         binding.user = user
-        Log.e("USER HOLDER", user.avatarUrl)
         Glide.with(binding.root).load(user.avatarUrl).circleCrop().into(binding.userAvatarImageView)
     }
 

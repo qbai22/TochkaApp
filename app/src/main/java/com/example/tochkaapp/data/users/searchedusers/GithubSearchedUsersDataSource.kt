@@ -1,5 +1,6 @@
 package com.example.tochkaapp.data.users.searchedusers
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
@@ -61,7 +62,7 @@ class GithubSearchedUsersDataSource(
                     // clear retry since last request succeeded
                     setRetry(null)
                     _loadingState.postValue(LoadingState.LOADED)
-                    callback.onResult(users,0)
+                    callback.onResult(users, 0)
                 }, { throwable ->
                     // keep a Completable for future retry
                     setRetry(Action { loadInitial(params, callback) })
@@ -82,6 +83,7 @@ class GithubSearchedUsersDataSource(
                     // clear retry since last request succeeded
                     setRetry(null)
                     _loadingState.postValue(LoadingState.LOADED)
+                    Log.e(TAG, "loading range page $lastRequestedPage")
                     lastRequestedPage++
                     callback.onResult(users)
                 }, { throwable ->
@@ -102,5 +104,8 @@ class GithubSearchedUsersDataSource(
         }
     }
 
+    companion object {
+        private const val TAG = "SEARCHED_DATA_SOURCE"
+    }
 
 }

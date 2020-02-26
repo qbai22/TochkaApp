@@ -2,13 +2,13 @@ package com.example.tochkaapp.screen.users
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tochkaapp.R
 import com.example.tochkaapp.data.model.GithubUser
@@ -64,8 +64,9 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         )
 
-        viewModel.users.observe(this, Observer { usersListAdapter.submitList(it) })
-
+        viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
+        viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
+        viewModel.loadingState.observe(this, Observer { Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show() })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -91,12 +92,16 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
            }*/
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onQueryTextSubmit(query: String): Boolean {
+        if (query.trim().isNotEmpty())
+            viewModel.searchUsers(query)
+        return true
     }
 
-    override fun onQueryTextChange(newText: String?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onQueryTextChange(query: String): Boolean {
+        if (query.trim().isNotEmpty())
+            viewModel.searchUsers(query)
+        return true
     }
 
     private fun openUserDetails(user: GithubUser) {

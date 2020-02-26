@@ -8,9 +8,11 @@ import com.example.tochkaapp.data.model.GithubUser
  * Created by Vladimir Kraev
  */
 interface UsersRepository :
-    ClosableRepository {
+    ClosableRepository,
+    LoadingProgressRepository
+{
 
-    fun observeUsers(): LiveData<PagedList<GithubUser>>
+    fun getUsers(): LiveData<PagedList<GithubUser>>
 
     fun searchUsers(query: String): LiveData<PagedList<GithubUser>>
 

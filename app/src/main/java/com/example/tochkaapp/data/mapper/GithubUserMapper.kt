@@ -17,10 +17,10 @@ class GithubUserMapper : UserMapper {
         return mappedUsers
     }
 
-    override fun mapUsers(usersSearchResponse: DtoSearchResponse): List<GithubUser> {
+    override fun mapUsers(dtoSearchResponse: DtoSearchResponse): List<GithubUser> {
         val mappedUsers = ArrayList<GithubUser>()
 
-        usersSearchResponse.users.forEach { mappedUsers.add(mapUser(it)) }
+        dtoSearchResponse.users.forEach { mappedUsers.add(mapUser(it)) }
 
         return mappedUsers
     }

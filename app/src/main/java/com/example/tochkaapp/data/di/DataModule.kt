@@ -1,16 +1,11 @@
 package com.example.tochkaapp.data.di
 
-import android.app.Application
-import android.content.Context
-import androidx.paging.DataSource
 import com.example.tochkaapp.data.http.api.GithubApi
 import com.example.tochkaapp.data.http.api.GithubApiCreator
 import com.example.tochkaapp.data.mapper.GithubUserMapper
 import com.example.tochkaapp.data.mapper.UserMapper
-import com.example.tochkaapp.data.model.GithubUser
 import com.example.tochkaapp.data.repository.GitHubUsersRepository
 import com.example.tochkaapp.data.repository.UsersRepository
-import com.example.tochkaapp.data.users.allusers.GithubAllUsersDataSourceFactory
 import dagger.Module
 import dagger.Provides
 import io.reactivex.disposables.CompositeDisposable
@@ -20,7 +15,7 @@ import javax.inject.Singleton
  * Created by Vladimir Kraev
  */
 @Module
-class DataModule{
+class DataModule {
 
     @Provides
     @Singleton
