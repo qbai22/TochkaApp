@@ -1,9 +1,9 @@
 <resources>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="default_small_margin">8dp</dimen>
-    <dimen name="default_medium_margin">16dp</dimen>
-    <dimen name="default_large_margin">24dp</dimen>
+    <dimen name="default_small_margin">12dp</dimen>
+    <dimen name="default_medium_margin">24dp</dimen>
+    <dimen name="default_large_margin">48dp</dimen>
 
 
     <!-- images -->
