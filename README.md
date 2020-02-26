@@ -5,4 +5,4 @@
 Kotlin
 
 Используемые технологии:
-Dagger, Architecture Components (Navigation, ViewModel, LiveData, Pagination), RxJava, Retrofit, DataBinding
+Dagger, Architecture Components (Navigation, ViewModel, LiveData, Pagination), RxJava, Retrofit, DataBinding, Glide
