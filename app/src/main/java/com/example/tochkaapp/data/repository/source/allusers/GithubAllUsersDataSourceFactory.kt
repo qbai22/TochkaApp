@@ -1,4 +1,4 @@
-package com.example.tochkaapp.data.users.allusers
+package com.example.tochkaapp.data.repository.source.allusers
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource

@@ -1,19 +1,45 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <import type="android.view.View" />
 
         <variable
+            name="user"
+            type="com.example.tochkaapp.data.model.GithubUser" />
+
+        <variable
             name="view_model"
-            type="com.example.tochkaapp.screen.details.DetailsViewModel" />
+            type="com.example.tochkaapp.screen.details.UserDetailsViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/user_details_picture"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/big_avatar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:text="@{user.name}"
+            android:id="@+id/user_name_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_medium_margin"
+            android:textColor="@color/blackText"
+            android:textSize="@dimen/large_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user_details_picture"
+            tools:text="Veniamin Valerianovich Petrov" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
  * Created by Vladimir Kraev
  */
 
-class DetailsViewModel : ViewModel() {
+class UserDetailsViewModel : ViewModel() {
 
 
 

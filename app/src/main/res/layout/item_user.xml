@@ -31,8 +31,8 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/user_avatar_image_view"
-                android:layout_width="@dimen/avatar_width"
-                android:layout_height="@dimen/avatar_height"
+                android:layout_width="@dimen/small_avatar_width"
+                android:layout_height="@dimen/small_avatar_height"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

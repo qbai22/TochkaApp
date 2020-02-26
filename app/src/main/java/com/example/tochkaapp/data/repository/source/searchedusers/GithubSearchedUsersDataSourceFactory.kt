@@ -1,4 +1,4 @@
-package com.example.tochkaapp.data.users.searchedusers
+package com.example.tochkaapp.data.repository.source.searchedusers
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource

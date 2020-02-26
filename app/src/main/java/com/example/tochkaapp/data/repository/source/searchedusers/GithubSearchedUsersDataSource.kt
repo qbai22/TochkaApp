@@ -1,4 +1,4 @@
-package com.example.tochkaapp.data.users.searchedusers
+package com.example.tochkaapp.data.repository.source.searchedusers
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -55,9 +55,11 @@ class GithubSearchedUsersDataSource(
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<GithubUser>) {
         _loadingState.postValue(LoadingState.LOADING)
 
+        Log.e(TAG, "load initial called")
         compositeDisposable.add(
             githubApi.searchUsers(query, lastRequestedPage, params.requestedLoadSize)
                 .map { mapper.mapUsers(it) }
+                .doOnError{Log.e(TAG, "load initial error occured ${it.message}")}
                 .subscribe({ users ->
                     // clear retry since last request succeeded
                     setRetry(null)
@@ -75,7 +77,7 @@ class GithubSearchedUsersDataSource(
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<GithubUser>) {
         // set network value to loading.
         _loadingState.postValue(LoadingState.LOADING)
-
+        Log.e(TAG, "load range called")
         compositeDisposable.add(
             githubApi.searchUsers(query, lastRequestedPage, params.loadSize)
                 .map { mapper.mapUsers(it) }

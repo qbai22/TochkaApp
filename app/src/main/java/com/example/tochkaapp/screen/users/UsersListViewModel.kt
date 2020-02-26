@@ -9,7 +9,6 @@ import com.example.tochkaapp.UsersApp
 import com.example.tochkaapp.data.model.GithubUser
 import com.example.tochkaapp.data.repository.UsersRepository
 import com.example.tochkaapp.utils.LoadingState
-import com.example.tochkaapp.utils.NavigateToDetailsEvent
 import javax.inject.Inject
 
 /**
@@ -24,13 +23,10 @@ class UsersListViewModel : ViewModel() {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
     }
 
-    private val _navigateToContactDetailsEvent = MutableLiveData<NavigateToDetailsEvent>()
-    val navigateToContactDetailsEvent: LiveData<NavigateToDetailsEvent> =
-        _navigateToContactDetailsEvent
-
     private val queryLiveData = MutableLiveData<String>()
 
     val allUsers: LiveData<PagedList<GithubUser>> = repository.getUsers()
+
     val loadingState: LiveData<LoadingState> = repository.observeLoading()
 
     val searchedUsers: LiveData<PagedList<GithubUser>> =

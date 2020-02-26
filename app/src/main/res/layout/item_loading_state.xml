@@ -5,9 +5,15 @@
 
         <import type="android.view.View" />
 
+        <import type="com.example.tochkaapp.utils.State" />
+
         <variable
             name="view_model"
             type="com.example.tochkaapp.screen.users.UsersListViewModel" />
+
+        <variable
+            name="loading_state"
+            type="com.example.tochkaapp.utils.LoadingState" />
 
     </data>
 
@@ -20,9 +26,12 @@
             android:id="@+id/errorMessageTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:text='@{loading_state.message ?? ""}'
+            android:visibility="@{loading_state.message != null ? View.VISIBLE : View.GONE}" />
 
         <ProgressBar
+            android:visibility="@{loading_state.state == State.LOADING ? View.VISIBLE : View.GONE}"
             android:id="@+id/loadingProgressBar"
             style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
@@ -30,13 +39,14 @@
             android:layout_gravity="center" />
 
         <Button
-            android:onClick="@{() -> view_model.retry()}"
-            android:id="@+id/retryLoadingButton"
+            android:id="@+id/retryButton"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/retry" />
+            android:onClick="@{() -> view_model.retry()}"
+            android:text="@string/retry"
+            android:visibility="@{loading_state.state == State.FAILED ? View.VISIBLE : View.GONE}" />
 
     </LinearLayout>
 

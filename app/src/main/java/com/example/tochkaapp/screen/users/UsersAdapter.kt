@@ -5,29 +5,42 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tochkaapp.R
-import com.example.tochkaapp.utils.LoadingState
 import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.databinding.ItemUserBinding
+import com.example.tochkaapp.utils.LoadingState
 
 /**
  * Created by Vladimir Kraev
  */
-class UsersAdapter(private val viewModel: UsersListViewModel)
-    : PagedListAdapter<GithubUser, RecyclerView.ViewHolder>(UserDiffCallback) {
+internal class UsersAdapter(
+    private val viewModel: UsersListViewModel,
+    private val navigationListener: UserItemNavigationListener
+) : PagedListAdapter<GithubUser, RecyclerView.ViewHolder>(UserDiffCallback) {
+
+    internal interface UserItemNavigationListener {
+        fun navigate(user: GithubUser, binding: ItemUserBinding)
+    }
 
     private var loadingState: LoadingState? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            R.layout.item_user -> UserViewHolder.from(parent)
-        //    R.layout.item_network_state -> NetworkStateViewHolder.from(parent, retryCallback)
-            else -> throw IllegalArgumentException("unknown view type")
+            R.layout.item_user -> UserViewHolder.create(parent, navigationListener)
+            R.layout.item_loading_state -> LoadingStateViewHolder.create(parent)
+            else -> throw IllegalArgumentException("Unknown view type")
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
-            R.layout.item_user -> (holder as UserViewHolder).bindUser(viewModel, getItem(position)!!)
-        //    R.layout.item_network_state -> (holder as NetworkStateViewHolder).bindTo(networkState)
+            R.layout.item_user -> (holder as UserViewHolder).bindUser(
+                viewModel,
+                getItem(position)!!
+            )
+            R.layout.item_loading_state -> (holder as LoadingStateViewHolder).bindLoadingState(
+                viewModel,
+                loadingState!!
+            )
         }
     }
 
@@ -37,7 +50,7 @@ class UsersAdapter(private val viewModel: UsersListViewModel)
 
     override fun getItemViewType(position: Int): Int {
         return if (hasExtraRow() && position == itemCount - 1) {
-            R.layout.item_network_state
+            R.layout.item_loading_state
         } else {
             R.layout.item_user
         }

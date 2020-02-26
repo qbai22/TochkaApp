@@ -8,17 +8,20 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tochkaapp.R
 import com.example.tochkaapp.data.model.GithubUser
 import com.example.tochkaapp.databinding.FragmentUsersListBinding
-import com.example.tochkaapp.utils.NavigateToDetailsEvent
+import com.example.tochkaapp.databinding.ItemUserBinding
+import kotlinx.android.synthetic.main.item_user.view.*
 
 /**
  * Created by Vladimir Kraev
  */
-class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
+class UsersListFragment : Fragment(), SearchView.OnQueryTextListener,
+    UsersAdapter.UserItemNavigationListener {
 
     private lateinit var viewModel: UsersListViewModel
     private lateinit var binding: FragmentUsersListBinding
@@ -38,7 +41,7 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
 
         setHasOptionsMenu(true)
         viewModel = ViewModelProviders.of(this).get(UsersListViewModel::class.java)
-        usersListAdapter = UsersAdapter(viewModel)
+        usersListAdapter = UsersAdapter(viewModel, this)
         binding = FragmentUsersListBinding.inflate(inflater, container, false).also {
             it.viewModel = viewModel
         }
@@ -47,6 +50,11 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
             usersRecyclerView.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 adapter = usersListAdapter
+                postponeEnterTransition()
+                viewTreeObserver.addOnPreDrawListener {
+                    startPostponedEnterTransition()
+                    true
+                }
             }
         }
 
@@ -58,15 +66,13 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
 
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        viewModel.navigateToContactDetailsEvent.observe(this,
-            Observer<NavigateToDetailsEvent> {
-                it.getContentIfNotHandled()?.let { user -> openUserDetails(user) }
-            }
-        )
-
         viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
         viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-        viewModel.loadingState.observe(this, Observer { Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show() })
+        viewModel.loadingState.observe(this, Observer {
+            usersListAdapter.setNetworkState(it)
+            Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -98,16 +104,20 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener {
         return true
     }
 
+
     override fun onQueryTextChange(query: String): Boolean {
-        if (query.trim().isNotEmpty())
-            viewModel.searchUsers(query)
         return true
     }
 
-    private fun openUserDetails(user: GithubUser) {
+    override fun navigate(user: GithubUser, binding: ItemUserBinding) {
         val action = UsersListFragmentDirections.actionRepositoriesFragmentToDetailsFragment(user)
-        findNavController().navigate(action)
+        val extras = FragmentNavigatorExtras(
+            binding.root.user_avatar_image_view to user.avatarUrl,
+            binding.root.user_name_text_view to user.name
+        )
+        findNavController().navigate(action, extras)
     }
+
 
     companion object {
         private const val TAG = "WELCOME_FRAGMENT"

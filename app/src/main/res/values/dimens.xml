@@ -7,16 +7,16 @@
 
 
     <!-- images -->
-    <dimen name="avatar_height">48dp</dimen>
-    <dimen name="avatar_width">48dp</dimen>
+    <dimen name="small_avatar_height">48dp</dimen>
+    <dimen name="small_avatar_width">48dp</dimen>
+    <dimen name="big_avatar_height">184dp</dimen>
 
     <!-- text -->
     <dimen name="large_text">24sp</dimen>
     <dimen name="medium_text">20sp</dimen>
     <dimen name="small_text">16sp</dimen>
 
-    <!-- buttons -->
-    <dimen name="login_button_width">256dp</dimen>
-
+    <!-- cardview -->
+    <dimen name="item_card_view_corner_radius">12dp</dimen>
 
 </resources>
