@@ -31,6 +31,8 @@ class UsersListFragment :
 
     private lateinit var usersListAdapter: UsersAdapter
 
+    private lateinit var searchView: SearchView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,7 +60,6 @@ class UsersListFragment :
                     startPostponedEnterTransition()
                     true
                 }
-
             }
         }
 
@@ -67,23 +68,22 @@ class UsersListFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         binding.lifecycleOwner = this.viewLifecycleOwner
-        initialObserve()
+        startInitialObserve()
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
-            Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
+            Log.e(TAG, it.toString())
         })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_contact_list, menu)
         val searchItem = menu.findItem(R.id.search_item)
-        val searchView: SearchView = searchItem.actionView as SearchView
-        setupSearchView(searchView, searchItem)
+        searchView = searchItem.actionView as SearchView
+        setupSearchView(searchView)
     }
 
-    private fun setupSearchView(searchView: SearchView, searchMenuItem: MenuItem) {
+    private fun setupSearchView(searchView: SearchView) {
         searchView.apply {
             setOnQueryTextListener(this@UsersListFragment)
             queryHint = getString(R.string.search_hint)
@@ -93,31 +93,29 @@ class UsersListFragment :
 
     override fun onQueryTextSubmit(query: String): Boolean {
         viewModel.onQueryChanged(query)
-        observeSearch()
+        startSearchObserve()
+        searchView.clearFocus()
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        if (query.isEmpty()) {
-            Log.e(TAG, "empty text change called")
-            observeAll()
-        }
+        if (query.isEmpty()) startObserveAll()
         return true
     }
 
     //we do need a separate case to properly work around of fragment being destroyed
-    private fun initialObserve() {
+    private fun startInitialObserve() {
         if (viewModel.queryLiveData.value.isNullOrBlank())
             viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
         else viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
     }
 
-    private fun observeSearch() {
+    private fun startSearchObserve() {
         viewModel.allUsers.removeObservers(this)
         viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
     }
 
-    private fun observeAll() {
+    private fun startObserveAll() {
         viewModel.searchedUsers.removeObservers(this)
         if (!viewModel.allUsers.hasObservers())
             viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })

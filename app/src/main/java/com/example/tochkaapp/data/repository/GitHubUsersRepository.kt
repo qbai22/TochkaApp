@@ -2,6 +2,7 @@ package com.example.tochkaapp.data.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
@@ -11,6 +12,7 @@ import com.example.tochkaapp.data.mapper.UserMapper
 import com.example.tochkaapp.data.model.GithubUser
 import com.example.tochkaapp.data.repository.source.allusers.GithubAllUsersDataSource
 import com.example.tochkaapp.data.repository.source.allusers.GithubAllUsersDataSourceFactory
+import com.example.tochkaapp.data.repository.source.searchedusers.GithubSearchedUsersDataSource
 import com.example.tochkaapp.data.repository.source.searchedusers.GithubSearchedUsersDataSourceFactory
 import com.example.tochkaapp.utils.LoadingState
 import io.reactivex.disposables.CompositeDisposable
@@ -24,32 +26,42 @@ class GitHubUsersRepository(
     private val mapper: UserMapper
 ) : UsersRepository {
 
-    private var loadingState: LiveData<LoadingState> = MutableLiveData()
+    private var allUsersLoadingState: LiveData<LoadingState> = MutableLiveData()
+    private var searchedUsersLoadingState: LiveData<LoadingState> = MutableLiveData()
+
+    private val loadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
+
     private val pagedListConfig: PagedList.Config = setupConfig()
 
 
-
-    override fun getUsers(): LiveData<PagedList<GithubUser>> {
+    override fun getAllUsers(): LiveData<PagedList<GithubUser>> {
         Log.e(TAG, "CALLED GET USERS")
         clear()
         val factory = GithubAllUsersDataSourceFactory(compositeDisposable, githubApi, mapper)
 
-        loadingState = Transformations.switchMap<GithubAllUsersDataSource, LoadingState>(
+        allUsersLoadingState = Transformations.switchMap<GithubAllUsersDataSource, LoadingState>(
             factory.dataSourceValue, { it.loadingState })
+
+        loadingState.addSource(allUsersLoadingState) { loadingState.value = it }
 
         return LivePagedListBuilder(factory, pagedListConfig).setInitialLoadKey(0).build()
     }
 
     override fun searchUsers(query: String): LiveData<PagedList<GithubUser>> {
-        Log.e(TAG, "CALLED SEARCHED USERS QUERY = $query")
         clear()
         val factory =
             GithubSearchedUsersDataSourceFactory(compositeDisposable, githubApi, mapper, query)
+
+        searchedUsersLoadingState =
+            Transformations.switchMap<GithubSearchedUsersDataSource, LoadingState>(
+                factory.dataSourceValue, { it.loadingState })
+
+        loadingState.addSource(searchedUsersLoadingState) { loadingState.value = it }
+
         return LivePagedListBuilder(factory, pagedListConfig).build()
     }
 
-    override fun observeLoading(): LiveData<LoadingState> = loadingState
-
+    override fun observeLoading() = loadingState
 
     private fun setupConfig() =
         PagedList.Config.Builder()
@@ -60,10 +72,10 @@ class GitHubUsersRepository(
 
 
     override fun close() {
-        compositeDisposable.clear()
+        clear()
     }
 
-    private fun clear(){
+    private fun clear() {
         compositeDisposable.clear()
     }
 
