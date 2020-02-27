@@ -24,12 +24,13 @@ class UsersListViewModel : ViewModel() {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
     }
 
-    private val queryLiveData = MutableLiveData<String>()
+    val queryLiveData = MutableLiveData<String>()
 
-    val loadingState: LiveData<LoadingState> = repository.observeLoading()
     val allUsers: LiveData<PagedList<GithubUser>> = repository.getUsers()
     val searchedUsers: LiveData<PagedList<GithubUser>> =
         Transformations.switchMap(queryLiveData) { repository.searchUsers(it) }
+
+    val loadingState: LiveData<LoadingState> = repository.observeLoading()
 
     fun onQueryChanged(queryString: String) {
         queryLiveData.value = queryString

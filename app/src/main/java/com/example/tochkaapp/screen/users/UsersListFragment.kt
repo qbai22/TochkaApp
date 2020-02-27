@@ -69,9 +69,7 @@ class UsersListFragment :
         super.onActivityCreated(savedInstanceState)
 
         binding.lifecycleOwner = this.viewLifecycleOwner
-
-        observeAll()
-
+        initialObserve()
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
             Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
@@ -86,21 +84,12 @@ class UsersListFragment :
     }
 
     private fun setupSearchView(searchView: SearchView, searchMenuItem: MenuItem) {
-
         searchView.apply {
             setOnQueryTextListener(this@UsersListFragment)
             queryHint = getString(R.string.search_hint)
             maxWidth = Integer.MAX_VALUE
         }
-        /*   val previousFilter = viewModel.getFilterInput()
-           previousFilter?.let {
-               if (it.isNotEmpty()) {
-                   searchMenuItem.expandActionView()
-                   searchView.setQuery(previousFilter, false)
-               }
-           }*/
     }
-
 
     override fun onQueryTextSubmit(query: String): Boolean {
         viewModel.onQueryChanged(query)
@@ -108,12 +97,19 @@ class UsersListFragment :
         return true
     }
 
-
     override fun onQueryTextChange(query: String): Boolean {
         if (query.isEmpty()) {
+            Log.e(TAG, "empty text change called")
             observeAll()
         }
         return true
+    }
+
+    //we do need a separate case to properly work around of fragment being destroyed
+    private fun initialObserve() {
+        if (viewModel.queryLiveData.value.isNullOrBlank())
+            viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
+        else viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
     }
 
     private fun observeSearch() {
@@ -125,7 +121,6 @@ class UsersListFragment :
         viewModel.searchedUsers.removeObservers(this)
         if (!viewModel.allUsers.hasObservers())
             viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-
     }
 
     override fun navigate(user: GithubUser, binding: ItemUserBinding) {
@@ -136,7 +131,6 @@ class UsersListFragment :
         )
         findNavController().navigate(action, extras)
     }
-
 
     companion object {
         private const val TAG = "USERS_LIST_FRAGMENT"

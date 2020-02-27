@@ -28,7 +28,6 @@ class GithubAllUsersDataSource(
     val loadingState: LiveData<LoadingState>
         get() = _loadingState
 
-
     private val _initialLoadingState = MutableLiveData<LoadingState>()
     val initialLoadingState: LiveData<LoadingState>
         get() = _initialLoadingState
