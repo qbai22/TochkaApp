@@ -1,5 +1,6 @@
 package com.example.tochkaapp.data.repository.source.allusers
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.ItemKeyedDataSource
@@ -52,27 +53,22 @@ class GithubAllUsersDataSource(
         params: LoadInitialParams<Long>,
         callback: LoadInitialCallback<GithubUser>
     ) {
-        // update network states.
-        // we also provide an initial load state to the listeners so that the UI can know when the
-        // very first list is loaded.
         _loadingState.postValue(LoadingState.LOADING)
         _initialLoadingState.postValue(LoadingState.LOADING)
 
-        //get the initial users from the api
         compositeDisposable.add(
             githubApi.getUsers(1, params.requestedLoadSize)
                 .map { mapper.mapUsers(it) }
                 .subscribe({ users ->
-                    // clear retry since last request succeeded
+                    Log.e(TAG, "users loaded size ${users.size}")
                     setRetry(null)
                     _loadingState.postValue(LoadingState.LOADED)
                     _initialLoadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users)
                 }, { throwable ->
-                    // keep a Completable for future retry
+                    Log.e(TAG, "error occured ${throwable.message}")
                     setRetry(Action { loadInitial(params, callback) })
                     val error = LoadingState.error(throwable.message)
-                    // publish the error
                     _loadingState.postValue(error)
                     _initialLoadingState.postValue(error)
                 })
@@ -80,22 +76,16 @@ class GithubAllUsersDataSource(
     }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<GithubUser>) {
-        // set network value to loading.
         _loadingState.postValue(LoadingState.LOADING)
-
-        //get the users from the api after id
         compositeDisposable.add(
             githubApi.getUsers(params.key, params.requestedLoadSize)
                 .map { mapper.mapUsers(it) }
                 .subscribe({ users ->
-                    // clear retry since last request succeeded
                     setRetry(null)
                     _loadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users)
                 }, { throwable ->
-                    // keep a Completable for future retry
                     setRetry(Action { loadAfter(params, callback) })
-                    // publish the error
                     _loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )
@@ -113,6 +103,10 @@ class GithubAllUsersDataSource(
         } else {
             this.retryCompletable = Completable.fromAction(action)
         }
+    }
+
+    companion object {
+        private const val TAG = "ALL_USERS_SOURCE"
     }
 
 }

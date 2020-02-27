@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -24,7 +23,6 @@ import kotlinx.android.synthetic.main.fragment_details.view.*
 class UserDetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailsBinding
-    private lateinit var viewModel: UserDetailsViewModel
 
     val args: UserDetailsFragmentArgs by navArgs()
 
@@ -42,9 +40,7 @@ class UserDetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProviders.of(this).get(UserDetailsViewModel::class.java)
         binding = FragmentDetailsBinding.inflate(inflater, container, false)
-        binding.viewModel = this.viewModel
         binding.user = user
         return binding.root
     }

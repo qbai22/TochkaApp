@@ -1,6 +1,7 @@
 package com.example.tochkaapp.screen.users
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +21,9 @@ import kotlinx.android.synthetic.main.item_user.view.*
 /**
  * Created by Vladimir Kraev
  */
-class UsersListFragment : Fragment(), SearchView.OnQueryTextListener,
+class UsersListFragment :
+    Fragment(),
+    SearchView.OnQueryTextListener,
     UsersAdapter.UserItemNavigationListener {
 
     private lateinit var viewModel: UsersListViewModel
@@ -55,6 +58,7 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener,
                     startPostponedEnterTransition()
                     true
                 }
+
             }
         }
 
@@ -66,13 +70,12 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener,
 
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-        viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
+        observeAll()
+
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
             Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
         })
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -98,15 +101,31 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener,
            }*/
     }
 
+
     override fun onQueryTextSubmit(query: String): Boolean {
-        if (query.trim().isNotEmpty())
-            viewModel.searchUsers(query)
+        viewModel.onQueryChanged(query)
+        observeSearch()
         return true
     }
 
 
     override fun onQueryTextChange(query: String): Boolean {
+        if (query.isEmpty()) {
+            observeAll()
+        }
         return true
+    }
+
+    private fun observeSearch() {
+        viewModel.allUsers.removeObservers(this)
+        viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
+    }
+
+    private fun observeAll() {
+        viewModel.searchedUsers.removeObservers(this)
+        if (!viewModel.allUsers.hasObservers())
+            viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
+
     }
 
     override fun navigate(user: GithubUser, binding: ItemUserBinding) {
@@ -120,7 +139,7 @@ class UsersListFragment : Fragment(), SearchView.OnQueryTextListener,
 
 
     companion object {
-        private const val TAG = "WELCOME_FRAGMENT"
+        private const val TAG = "USERS_LIST_FRAGMENT"
     }
 
 

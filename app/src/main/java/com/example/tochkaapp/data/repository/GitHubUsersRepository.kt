@@ -27,6 +27,8 @@ class GitHubUsersRepository(
     private var loadingState: LiveData<LoadingState> = MutableLiveData()
     private val pagedListConfig: PagedList.Config = setupConfig()
 
+
+
     override fun getUsers(): LiveData<PagedList<GithubUser>> {
         Log.e(TAG, "CALLED GET USERS")
         clear()

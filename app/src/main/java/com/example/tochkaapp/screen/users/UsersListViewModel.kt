@@ -1,5 +1,6 @@
 package com.example.tochkaapp.screen.users
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -25,21 +26,23 @@ class UsersListViewModel : ViewModel() {
 
     private val queryLiveData = MutableLiveData<String>()
 
-    val allUsers: LiveData<PagedList<GithubUser>> = repository.getUsers()
-
     val loadingState: LiveData<LoadingState> = repository.observeLoading()
-
+    val allUsers: LiveData<PagedList<GithubUser>> = repository.getUsers()
     val searchedUsers: LiveData<PagedList<GithubUser>> =
         Transformations.switchMap(queryLiveData) { repository.searchUsers(it) }
 
-    fun retry() {}
-
-    fun searchUsers(queryString: String) {
+    fun onQueryChanged(queryString: String) {
         queryLiveData.value = queryString
     }
+
+    fun retry() {}
 
     override fun onCleared() {
         super.onCleared()
         repository.close()
+    }
+
+    companion object {
+        private const val TAG = "USERS_LIST_VM"
     }
 }
