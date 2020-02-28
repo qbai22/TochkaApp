@@ -5,8 +5,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagedList
 import com.example.tochkaapp.data.model.User
+import com.example.tochkaapp.data.repository.executor.MainThreadExecutor
 import com.example.tochkaapp.data.repository.factory.UsersDataSourcesFactory
-import com.example.tochkaapp.data.repository.source.RetriableDataSource
+import com.example.tochkaapp.data.repository.source.RepeatableDataSource
 import com.example.tochkaapp.utils.LoadingState
 import java.util.concurrent.Executors
 
@@ -22,33 +23,32 @@ class GitHubUsersRepository(
     override val initialLoadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
 
     private val usersData = MutableLiveData<PagedList<User>>()
+    private lateinit var currentDataSource: RepeatableDataSource<User>
 
-    override fun getUsers(query: String?): LiveData<PagedList<User>> {
-        if (query.isNullOrEmpty()) {
-            usersData.postValue(getAllUsers())
-        } else usersData.postValue(searchUsers(query))
+    override fun loadUsers(query: String?): LiveData<PagedList<User>> {
+
+        if (query.isNullOrEmpty()) usersData.postValue(getAllUsers())
+        else usersData.postValue(searchUsers(query))
 
         return usersData
     }
 
     private fun getAllUsers(): PagedList<User> {
-        clear()
         val dataSource = usersDataSourceFactory.createAllUsersDataSource()
+        currentDataSource = dataSource
         loadingState.addSource(dataSource.loadingState) { loadingState.value = it }
-
         return buildUsersPagedList(dataSource)
     }
 
 
     private fun searchUsers(query: String): PagedList<User> {
-        clear()
         val dataSource = usersDataSourceFactory.createSearchedUsersDataSource(query)
-
+        currentDataSource = dataSource
         loadingState.addSource(dataSource.loadingState) { loadingState.value = it }
         return buildUsersPagedList(dataSource)
     }
 
-    private fun buildUsersPagedList(dataSource: RetriableDataSource<User>) =
+    private fun buildUsersPagedList(dataSource: RepeatableDataSource<User>) =
         PagedList.Builder(dataSource, setupConfig())
             .setNotifyExecutor(MainThreadExecutor())
             .setFetchExecutor(Executors.newSingleThreadExecutor())
@@ -61,13 +61,12 @@ class GitHubUsersRepository(
             .setPageSize(PAGE_SIZE)
             .build()
 
-
-    override fun close() {
-        clear()
+    override fun retryLoad() {
+        currentDataSource.repeatLastCall()
     }
 
-    private fun clear() {
-
+    override fun close() {
+        currentDataSource.close()
     }
 
     companion object {

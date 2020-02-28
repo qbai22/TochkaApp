@@ -10,6 +10,7 @@ import com.example.tochkaapp.data.model.User
 interface UsersRepository : Closable,
     Loadable {
 
-    fun getUsers(query: String?): LiveData<PagedList<User>>
+    fun loadUsers(query: String?): LiveData<PagedList<User>>
+    fun retryLoad()
 
 }

@@ -19,22 +19,23 @@ import io.reactivex.schedulers.Schedulers
 class GithubAllUsersDataSource(
     private val githubApi: GithubApi,
     private val mapper: UserMapper
-) : RetriableDataSource<User>() {
+) : RepeatableDataSource<User>() {
 
     override val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
     override val initialLoadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()
     private var lastUserId = 0L
-    // Keep Completable reference for the retry event
-    private var retryCompletable: Completable? = null
+
+    // Keep Completable reference for the repeat event
+    private var repeatCompletable: Completable? = null
 
     override fun close() {
         compositeDisposable.clear()
     }
 
-    override fun retry() {
-        retryCompletable?.let {
+    override fun repeatLastCall() {
+        repeatCompletable?.let {
             compositeDisposable.add(
                 it
                     .subscribeOn(Schedulers.io())
@@ -54,13 +55,14 @@ class GithubAllUsersDataSource(
                 .map { mapper.mapUsers(it) }
                 .doOnSuccess { lastUserId = it.last().id }
                 .subscribe({ users ->
-                    setRetry(null)
+                    //we don't need to repeat after successful call
+                    setRepeat(null)
                     loadingState.postValue(LoadingState.LOADED)
                     Log.e(TAG, "USERS DOWNLOADED SIZE = ${users.size}")
                     callback.onResult(users, 0)
                 }, { throwable ->
-                    // keep a Completable for future retry
-                    setRetry(Action { loadInitial(params, callback) })
+                    // keep a Completable for future repeat
+                    setRepeat(Action { loadInitial(params, callback) })
                     loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )
@@ -73,22 +75,19 @@ class GithubAllUsersDataSource(
                 .map { mapper.mapUsers(it) }
                 .doOnSuccess { lastUserId = it.last().id }
                 .subscribe({ users ->
-                    setRetry(null)
+                    setRepeat(null)
                     loadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users)
                 }, { throwable ->
-                    setRetry(Action { loadRange(params, callback) })
+                    setRepeat(Action { loadRange(params, callback) })
                     loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )
     }
 
-    private fun setRetry(action: Action?) {
-        if (action == null) {
-            this.retryCompletable = null
-        } else {
-            this.retryCompletable = Completable.fromAction(action)
-        }
+    private fun setRepeat(action: Action?) {
+        repeatCompletable = if (action == null) null
+         else Completable.fromAction(action)
     }
 
     companion object {

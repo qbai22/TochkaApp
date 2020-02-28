@@ -1,4 +1,4 @@
-package com.example.tochkaapp.data.repository
+package com.example.tochkaapp.data.repository.executor
 
 import android.os.Handler
 import android.os.Looper

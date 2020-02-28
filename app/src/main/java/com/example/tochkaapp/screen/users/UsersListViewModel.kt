@@ -1,7 +1,6 @@
 package com.example.tochkaapp.screen.users
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.example.tochkaapp.UsersApp
@@ -22,14 +21,16 @@ class UsersListViewModel : ViewModel() {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
     }
 
-    val users: LiveData<PagedList<User>> = repository.getUsers(null)
+    val users: LiveData<PagedList<User>> = repository.loadUsers(null)
     val loadingState: LiveData<LoadingState> = repository.loadingState
 
     fun onQueryChanged(queryString: String) {
-        repository.getUsers(queryString)
+        repository.loadUsers(queryString)
     }
 
-    fun retry() {}
+    fun retry() {
+        repository.retryLoad()
+    }
 
     override fun onCleared() {
         super.onCleared()

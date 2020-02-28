@@ -5,7 +5,7 @@ import com.example.tochkaapp.data.mapper.UserMapper
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.data.repository.source.GithubAllUsersDataSource
 import com.example.tochkaapp.data.repository.source.GithubSearchedUsersDataSource
-import com.example.tochkaapp.data.repository.source.RetriableDataSource
+import com.example.tochkaapp.data.repository.source.RepeatableDataSource
 
 /**
  * Created by Vladimir Kraev
@@ -16,10 +16,10 @@ class GithubUsersDataSourceFactory(
     private val mapper: UserMapper
 ) : UsersDataSourcesFactory {
 
-    override fun createAllUsersDataSource(): RetriableDataSource<User> =
+    override fun createAllUsersDataSource(): RepeatableDataSource<User> =
         GithubAllUsersDataSource(api, mapper)
 
-    override fun createSearchedUsersDataSource(query: String): RetriableDataSource<User> =
+    override fun createSearchedUsersDataSource(query: String): RepeatableDataSource<User> =
         GithubSearchedUsersDataSource(api, mapper, query)
 
 }

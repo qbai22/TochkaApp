@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.tochkaapp.R
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentDetailsBinding
 import kotlinx.android.synthetic.main.fragment_details.*
@@ -53,6 +54,7 @@ class UserDetailsFragment : Fragment() {
 
         Glide.with(view.context)
             .load(user.avatarUrl)
+            .placeholder(R.drawable.icon_avatar_placeholder)
             .apply(RequestOptions.circleCropTransform())
             .into(user_details_picture)
 

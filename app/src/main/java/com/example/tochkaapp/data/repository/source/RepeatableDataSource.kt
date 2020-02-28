@@ -7,9 +7,9 @@ import com.example.tochkaapp.data.repository.Loadable
 /**
  * Created by Vladimir Kraev
  */
-abstract class RetriableDataSource<T> : PositionalDataSource<T>(),
+abstract class RepeatableDataSource<T> : PositionalDataSource<T>(),
     Loadable, Closable {
 
-    abstract fun retry()
+    abstract fun repeatLastCall()
 
 }
