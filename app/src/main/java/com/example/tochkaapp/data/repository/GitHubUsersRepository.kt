@@ -1,14 +1,10 @@
 package com.example.tochkaapp.data.repository
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.Transformations
-import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.data.repository.factory.UsersDataSourcesFactory
-import com.example.tochkaapp.data.repository.source.Loadable
-import com.example.tochkaapp.data.repository.source.MainThreadExecutor
+import com.example.tochkaapp.data.repository.source.RetriableDataSource
 import com.example.tochkaapp.utils.LoadingState
 import java.util.concurrent.Executors
 
@@ -20,52 +16,39 @@ class GitHubUsersRepository(
     private val usersDataSourceFactory: UsersDataSourcesFactory
 ) : UsersRepository {
 
-    private val loadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
-    private val pagedListConfig: PagedList.Config = setupConfig()
+    override val loadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
+    override val initialLoadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
 
-    override fun getAllUsers(): LiveData<PagedList<User>> {
+    override fun getUsers(query: String?) =
+        if (query.isNullOrEmpty()) getAllUsers() else searchUsers(query)
+
+
+    private fun getAllUsers(): PagedList<User> {
         clear()
-        val factory = usersDataSourceFactory.createAllUsersDataSourceFactory()
+        val dataSource = usersDataSourceFactory.createAllUsersDataSource()
+        loadingState.addSource(dataSource.loadingState) { loadingState.value = it }
 
-        val allUsersLoadingState = Transformations.switchMap<Loadable, LoadingState>(
-            factory.loadable, { it.loadingState })
-
-        loadingState.addSource(allUsersLoadingState) { loadingState.value = it }
-        return LivePagedListBuilder(factory, pagedListConfig).setInitialLoadKey(0).build()
+        return buildUsersPagedList(dataSource)
     }
 
-    override fun searchUsers(query: String): LiveData<PagedList<User>> {
+
+    private fun searchUsers(query: String): PagedList<User> {
         clear()
-        val factory = usersDataSourceFactory.createSearchedUsersDataSourceFactory(query)
+        val dataSource = usersDataSourceFactory.createSearchedUsersDataSource(query)
 
-        val searchedUsersLoadingState = Transformations.switchMap<Loadable, LoadingState>(
-            factory.loadable, { it.loadingState })
-
-        loadingState.addSource(searchedUsersLoadingState) { loadingState.value = it }
-        return LivePagedListBuilder(factory, pagedListConfig).build()
+        loadingState.addSource(dataSource.loadingState) { loadingState.value = it }
+        return buildUsersPagedList(dataSource)
     }
 
-    override fun getUsers(): PagedList<User> {
-        return buildPagedList()
-    }
-
-    private fun buildPagedList(): PagedList<User> {
-        val allUsersDataSource = usersDataSourceFactory.createAllUsersDataSourceFactory().create()
-        val pagedList = PagedList.Builder(allUsersDataSource, pagedListConfig)
+    private fun buildUsersPagedList(dataSource: RetriableDataSource<User>) =
+        PagedList.Builder(dataSource, setupConfig())
             .setNotifyExecutor(MainThreadExecutor())
             .setFetchExecutor(Executors.newSingleThreadExecutor())
             .build()
 
-        return pagedList
-    }
-
-    override fun observeLoading() = loadingState
-
     private fun setupConfig() =
         PagedList.Config.Builder()
             .setEnablePlaceholders(false)
-            .setInitialLoadSizeHint(PAGE_SIZE)
-            .setPageSize(PAGE_SIZE)
             .build()
 
 
@@ -79,6 +62,5 @@ class GitHubUsersRepository(
 
     companion object {
         private const val TAG = "GIT_HUB_REPO"
-        private const val PAGE_SIZE = 30
     }
 }

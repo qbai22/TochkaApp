@@ -1,12 +1,10 @@
-package com.example.tochkaapp.data.repository.source.searchedusers
+package com.example.tochkaapp.data.repository.source
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PositionalDataSource
 import com.example.tochkaapp.data.http.api.GithubApi
 import com.example.tochkaapp.data.mapper.UserMapper
 import com.example.tochkaapp.data.model.User
-import com.example.tochkaapp.data.repository.source.Loadable
 import com.example.tochkaapp.utils.LoadingState
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,23 +16,26 @@ import io.reactivex.schedulers.Schedulers
  * Created by Vladimir Kraev
  */
 
-class GithubSearchedUsersDataSource(
-    private val compositeDisposable: CompositeDisposable,
+class GithubAllUsersDataSource(
     private val githubApi: GithubApi,
-    private val mapper: UserMapper,
-    private val query: String
-) : PositionalDataSource<User>(), Loadable {
+    private val mapper: UserMapper
+) : RetriableDataSource<User>() {
 
-    // keep the last requested page. When the request is successful, increment the page number.
-    private var lastRequestedPage = 1
+    override val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
+    override val initialLoadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
-    override val loadingState = MutableLiveData<LoadingState>()
-    override val initialLoadingState = MutableLiveData<LoadingState>()
+    private val compositeDisposable = CompositeDisposable()
 
-    // keep Completable reference for the retry event
+    private var lastRequestedPage = 0
+
+    // Keep Completable reference for the retry event
     private var retryCompletable: Completable? = null
 
-    fun retry() {
+    override fun close() {
+        compositeDisposable.clear()
+    }
+
+    override fun retry() {
         retryCompletable?.let {
             compositeDisposable.add(
                 it
@@ -46,50 +47,43 @@ class GithubSearchedUsersDataSource(
     }
 
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<User>) {
-        this.loadingState.postValue(LoadingState.LOADING)
-
+        loadingState.postValue(LoadingState.LOADING)
+        val since = calculateLastUserId()
         Log.e(TAG, "load initial called")
         compositeDisposable.add(
-            githubApi.searchUsers(query, lastRequestedPage, params.requestedLoadSize)
+            githubApi.getUsers(since, SIZE_PER_PAGE)
                 .map { mapper.mapUsers(it) }
-                .doOnError{Log.e(TAG, "load initial error occured ${it.message}")}
                 .subscribe({ users ->
                     // clear retry since last request succeeded
                     setRetry(null)
-                    this.loadingState.postValue(LoadingState.LOADED)
+                    loadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users, 0)
                 }, { throwable ->
                     // keep a Completable for future retry
                     setRetry(Action { loadInitial(params, callback) })
                     // publish the error
-                    this.loadingState.postValue(LoadingState.error(throwable.message))
+                    loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )
     }
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<User>) {
-        // set network value to loading.
-        this.loadingState.postValue(LoadingState.LOADING)
-        Log.e(TAG, "load range called")
+        loadingState.postValue(LoadingState.LOADING)
+        val since = calculateLastUserId()
         compositeDisposable.add(
-            githubApi.searchUsers(query, lastRequestedPage, params.loadSize)
+            githubApi.getUsers(since, SIZE_PER_PAGE)
                 .map { mapper.mapUsers(it) }
                 .subscribe({ users ->
-                    // clear retry since last request succeeded
                     setRetry(null)
-                    this.loadingState.postValue(LoadingState.LOADED)
-                    Log.e(TAG, "loading range page $lastRequestedPage")
+                    loadingState.postValue(LoadingState.LOADED)
                     lastRequestedPage++
                     callback.onResult(users)
                 }, { throwable ->
-                    // keep a Completable for future retry
                     setRetry(Action { loadRange(params, callback) })
-                    // publish the error
-                    this.loadingState.postValue(LoadingState.error(throwable.message))
+                    loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )
     }
-
 
     private fun setRetry(action: Action?) {
         if (action == null) {
@@ -99,8 +93,11 @@ class GithubSearchedUsersDataSource(
         }
     }
 
+    private fun calculateLastUserId(): Long = (lastRequestedPage * SIZE_PER_PAGE).toLong() + 1
+
     companion object {
-        private const val TAG = "SEARCHED_DATA_SOURCE"
+        private const val TAG = "ALL_USERS_SOURCE"
+        private const val SIZE_PER_PAGE = 30
     }
 
 }
