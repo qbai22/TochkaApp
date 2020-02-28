@@ -16,8 +16,8 @@
         android:id="@+id/userDetailsFragment"
         android:name="com.example.tochkaapp.screen.details.UserDetailsFragment"
         android:label="DetailsFragment">
-        <argument android:name="githubUser"
-            app:argType="com.example.tochkaapp.data.model.GithubUser"/>
+        <argument android:name="user"
+            app:argType="com.example.tochkaapp.data.model.User"/>
     </fragment>
 
 </navigation>

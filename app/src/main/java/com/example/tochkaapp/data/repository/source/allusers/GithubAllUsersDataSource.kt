@@ -1,12 +1,12 @@
 package com.example.tochkaapp.data.repository.source.allusers
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.ItemKeyedDataSource
 import com.example.tochkaapp.data.http.api.GithubApi
 import com.example.tochkaapp.data.mapper.UserMapper
-import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.data.model.User
+import com.example.tochkaapp.data.repository.source.Loadable
 import com.example.tochkaapp.utils.LoadingState
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,15 +22,10 @@ class GithubAllUsersDataSource(
     private val compositeDisposable: CompositeDisposable,
     private val githubApi: GithubApi,
     private val mapper: UserMapper
-) : ItemKeyedDataSource<Long, GithubUser>() {
+) : ItemKeyedDataSource<Long, User>(), Loadable {
 
-    private val _loadingState = MutableLiveData<LoadingState>()
-    val loadingState: LiveData<LoadingState>
-        get() = _loadingState
-
-    private val _initialLoadingState = MutableLiveData<LoadingState>()
-    val initialLoadingState: LiveData<LoadingState>
-        get() = _initialLoadingState
+    override val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
+    override val initialLoadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
     /**
      * Keep Completable reference for the retry event
@@ -50,49 +45,51 @@ class GithubAllUsersDataSource(
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
-        callback: LoadInitialCallback<GithubUser>
+        callback: LoadInitialCallback<User>
     ) {
-        _loadingState.postValue(LoadingState.LOADING)
-        _initialLoadingState.postValue(LoadingState.LOADING)
+        loadingState.postValue(LoadingState.LOADING)
+        initialLoadingState.postValue(LoadingState.LOADING)
 
         compositeDisposable.add(
             githubApi.getUsers(1, params.requestedLoadSize)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .map { mapper.mapUsers(it) }
                 .subscribe({ users ->
                     Log.e(TAG, "users loaded size ${users.size}")
                     setRetry(null)
-                    _loadingState.postValue(LoadingState.LOADED)
-                    _initialLoadingState.postValue(LoadingState.LOADED)
+                    loadingState.postValue(LoadingState.LOADED)
+                    initialLoadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users)
                 }, { throwable ->
                     Log.e(TAG, "error occured ${throwable.message}")
                     setRetry(Action { loadInitial(params, callback) })
                     val error = LoadingState.error(throwable.message)
-                    _loadingState.postValue(error)
-                    _initialLoadingState.postValue(error)
+                    loadingState.postValue(error)
+                    initialLoadingState.postValue(error)
                 })
         )
     }
 
-    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<GithubUser>) {
-        _loadingState.postValue(LoadingState.LOADING)
+    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<User>) {
+        loadingState.postValue(LoadingState.LOADING)
         compositeDisposable.add(
             githubApi.getUsers(params.key, params.requestedLoadSize)
                 .map { mapper.mapUsers(it) }
                 .subscribe({ users ->
                     setRetry(null)
-                    _loadingState.postValue(LoadingState.LOADED)
+                    loadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users)
                 }, { throwable ->
                     setRetry(Action { loadAfter(params, callback) })
-                    _loadingState.postValue(LoadingState.error(throwable.message))
+                    loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<GithubUser>) {}
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<User>) {}
 
-    override fun getKey(item: GithubUser): Long {
+    override fun getKey(item: User): Long {
         return item.id
     }
 

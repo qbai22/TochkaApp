@@ -2,8 +2,7 @@ package com.example.tochkaapp.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
-import com.example.tochkaapp.data.model.GithubUser
-import com.example.tochkaapp.utils.LoadingState
+import com.example.tochkaapp.data.model.User
 
 /**
  * Created by Vladimir Kraev
@@ -12,8 +11,10 @@ interface UsersRepository :
     ClosableRepository,
     LoadingProgressRepository {
 
-    fun getAllUsers(): LiveData<PagedList<GithubUser>>
+    fun getUsers(): PagedList<User>
 
-    fun searchUsers(query: String): LiveData<PagedList<GithubUser>>
+    fun getAllUsers(): LiveData<PagedList<User>>
+
+    fun searchUsers(query: String): LiveData<PagedList<User>>
 
 }

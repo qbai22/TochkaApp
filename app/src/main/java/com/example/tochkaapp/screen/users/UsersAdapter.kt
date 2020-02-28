@@ -5,7 +5,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tochkaapp.R
-import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.ItemUserBinding
 import com.example.tochkaapp.utils.LoadingState
 
@@ -15,10 +15,10 @@ import com.example.tochkaapp.utils.LoadingState
 internal class UsersAdapter(
     private val viewModel: UsersListViewModel,
     private val navigationListener: UserItemNavigationListener
-) : PagedListAdapter<GithubUser, RecyclerView.ViewHolder>(UserDiffCallback) {
+) : PagedListAdapter<User, RecyclerView.ViewHolder>(UserDiffCallback) {
 
     internal interface UserItemNavigationListener {
-        fun navigate(user: GithubUser, binding: ItemUserBinding)
+        fun navigate(user: User, binding: ItemUserBinding)
     }
 
     private var loadingState: LoadingState? = null
@@ -89,12 +89,12 @@ internal class UsersAdapter(
     }
 
     companion object {
-        val UserDiffCallback = object : DiffUtil.ItemCallback<GithubUser>() {
-            override fun areItemsTheSame(oldItem: GithubUser, newItem: GithubUser): Boolean {
+        val UserDiffCallback = object : DiffUtil.ItemCallback<User>() {
+            override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: GithubUser, newItem: GithubUser): Boolean {
+            override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
                 return oldItem == newItem
             }
         }

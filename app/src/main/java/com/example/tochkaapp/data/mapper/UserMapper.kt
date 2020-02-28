@@ -1,6 +1,6 @@
 package com.example.tochkaapp.data.mapper
 
-import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.data.http.dto.DtoUser
 import com.example.tochkaapp.data.http.dto.DtoSearchResponse
 
@@ -10,9 +10,9 @@ import com.example.tochkaapp.data.http.dto.DtoSearchResponse
 interface UserMapper {
 
     //mapping users w/o a query request
-    fun mapUsers(dtoUsers: List<DtoUser>): List<GithubUser>
+    fun mapUsers(dtoUsers: List<DtoUser>): List<User>
 
     //mapping users with a query request
-    fun mapUsers(dtoSearchResponse: DtoSearchResponse) : List<GithubUser>
+    fun mapUsers(dtoSearchResponse: DtoSearchResponse) : List<User>
 
 }

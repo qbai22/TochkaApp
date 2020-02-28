@@ -1,64 +1,62 @@
 package com.example.tochkaapp.data.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.example.tochkaapp.data.http.api.GithubApi
-import com.example.tochkaapp.data.mapper.UserMapper
-import com.example.tochkaapp.data.model.GithubUser
-import com.example.tochkaapp.data.repository.source.allusers.GithubAllUsersDataSource
-import com.example.tochkaapp.data.repository.source.allusers.GithubAllUsersDataSourceFactory
-import com.example.tochkaapp.data.repository.source.searchedusers.GithubSearchedUsersDataSource
-import com.example.tochkaapp.data.repository.source.searchedusers.GithubSearchedUsersDataSourceFactory
+import com.example.tochkaapp.data.model.User
+import com.example.tochkaapp.data.repository.factory.UsersDataSourcesFactory
+import com.example.tochkaapp.data.repository.source.Loadable
+import com.example.tochkaapp.data.repository.source.MainThreadExecutor
 import com.example.tochkaapp.utils.LoadingState
-import io.reactivex.disposables.CompositeDisposable
+import java.util.concurrent.Executors
 
 /**
  * Created by Vladimir Kraev
  */
+
 class GitHubUsersRepository(
-    private val compositeDisposable: CompositeDisposable,
-    private val githubApi: GithubApi,
-    private val mapper: UserMapper
+    private val usersDataSourceFactory: UsersDataSourcesFactory
 ) : UsersRepository {
 
-    private var allUsersLoadingState: LiveData<LoadingState> = MutableLiveData()
-    private var searchedUsersLoadingState: LiveData<LoadingState> = MutableLiveData()
-
     private val loadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
-
     private val pagedListConfig: PagedList.Config = setupConfig()
 
-
-    override fun getAllUsers(): LiveData<PagedList<GithubUser>> {
-        Log.e(TAG, "CALLED GET USERS")
+    override fun getAllUsers(): LiveData<PagedList<User>> {
         clear()
-        val factory = GithubAllUsersDataSourceFactory(compositeDisposable, githubApi, mapper)
+        val factory = usersDataSourceFactory.createAllUsersDataSourceFactory()
 
-        allUsersLoadingState = Transformations.switchMap<GithubAllUsersDataSource, LoadingState>(
-            factory.dataSourceValue, { it.loadingState })
+        val allUsersLoadingState = Transformations.switchMap<Loadable, LoadingState>(
+            factory.loadable, { it.loadingState })
 
         loadingState.addSource(allUsersLoadingState) { loadingState.value = it }
-
         return LivePagedListBuilder(factory, pagedListConfig).setInitialLoadKey(0).build()
     }
 
-    override fun searchUsers(query: String): LiveData<PagedList<GithubUser>> {
+    override fun searchUsers(query: String): LiveData<PagedList<User>> {
         clear()
-        val factory =
-            GithubSearchedUsersDataSourceFactory(compositeDisposable, githubApi, mapper, query)
+        val factory = usersDataSourceFactory.createSearchedUsersDataSourceFactory(query)
 
-        searchedUsersLoadingState =
-            Transformations.switchMap<GithubSearchedUsersDataSource, LoadingState>(
-                factory.dataSourceValue, { it.loadingState })
+        val searchedUsersLoadingState = Transformations.switchMap<Loadable, LoadingState>(
+            factory.loadable, { it.loadingState })
 
         loadingState.addSource(searchedUsersLoadingState) { loadingState.value = it }
-
         return LivePagedListBuilder(factory, pagedListConfig).build()
+    }
+
+    override fun getUsers(): PagedList<User> {
+        return buildPagedList()
+    }
+
+    private fun buildPagedList(): PagedList<User> {
+        val allUsersDataSource = usersDataSourceFactory.createAllUsersDataSourceFactory().create()
+        val pagedList = PagedList.Builder(allUsersDataSource, pagedListConfig)
+            .setNotifyExecutor(MainThreadExecutor())
+            .setFetchExecutor(Executors.newSingleThreadExecutor())
+            .build()
+
+        return pagedList
     }
 
     override fun observeLoading() = loadingState
@@ -76,7 +74,7 @@ class GitHubUsersRepository(
     }
 
     private fun clear() {
-        compositeDisposable.clear()
+
     }
 
     companion object {

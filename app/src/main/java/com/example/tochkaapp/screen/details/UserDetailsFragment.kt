@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentDetailsBinding
 import kotlinx.android.synthetic.main.fragment_details.*
 import kotlinx.android.synthetic.main.fragment_details.view.*
@@ -26,13 +26,13 @@ class UserDetailsFragment : Fragment() {
 
     val args: UserDetailsFragmentArgs by navArgs()
 
-    private lateinit var user: GithubUser
+    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        user = args.githubUser
+        user = args.user
     }
 
     override fun onCreateView(

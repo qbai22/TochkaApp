@@ -3,7 +3,6 @@ package com.example.tochkaapp.screen.users
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -13,7 +12,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tochkaapp.R
-import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentUsersListBinding
 import com.example.tochkaapp.databinding.ItemUserBinding
 import kotlinx.android.synthetic.main.item_user.view.*
@@ -69,6 +68,7 @@ class UsersListFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.lifecycleOwner = this.viewLifecycleOwner
+        viewModel.init()
         startInitialObserve()
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
@@ -121,7 +121,7 @@ class UsersListFragment :
             viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
     }
 
-    override fun navigate(user: GithubUser, binding: ItemUserBinding) {
+    override fun navigate(user: User, binding: ItemUserBinding) {
         val action = UsersListFragmentDirections.actionRepositoriesFragmentToDetailsFragment(user)
         val extras = FragmentNavigatorExtras(
             binding.root.user_avatar_image_view to user.avatarUrl,

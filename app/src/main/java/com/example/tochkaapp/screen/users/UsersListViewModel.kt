@@ -6,7 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.example.tochkaapp.UsersApp
-import com.example.tochkaapp.data.model.GithubUser
+import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.data.repository.UsersRepository
 import com.example.tochkaapp.utils.LoadingState
 import javax.inject.Inject
@@ -25,8 +25,10 @@ class UsersListViewModel : ViewModel() {
 
     val queryLiveData = MutableLiveData<String>()
 
-    val allUsers: LiveData<PagedList<GithubUser>> = repository.getAllUsers()
-    val searchedUsers: LiveData<PagedList<GithubUser>> =
+    private val _allUsersData: MutableLiveData<PagedList<User>> = MutableLiveData()
+    val allUsers: LiveData<PagedList<User>> = _allUsersData
+
+    val searchedUsers: LiveData<PagedList<User>> =
         Transformations.switchMap(queryLiveData) { repository.searchUsers(it) }
 
     val loadingState: LiveData<LoadingState> = repository.observeLoading()
@@ -36,6 +38,10 @@ class UsersListViewModel : ViewModel() {
     }
 
     fun retry() {}
+
+    fun init(){
+        _allUsersData.value = repository.getUsers()
+    }
 
     override fun onCleared() {
         super.onCleared()

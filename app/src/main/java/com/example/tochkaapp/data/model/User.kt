@@ -6,7 +6,7 @@ import java.io.Serializable
  * Created by Vladimir Kraev
  */
 
-data class GithubUser(
+data class User(
 
     var id: Long,
 
