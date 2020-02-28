@@ -15,6 +15,7 @@ import com.example.tochkaapp.R
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentUsersListBinding
 import com.example.tochkaapp.databinding.ItemUserBinding
+import kotlinx.android.synthetic.main.fragment_users_list.*
 import kotlinx.android.synthetic.main.item_user.view.*
 
 /**
@@ -68,7 +69,7 @@ class UsersListFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.lifecycleOwner = this.viewLifecycleOwner
-        viewModel.init()
+
         viewModel.users.observe(this, Observer { usersListAdapter.submitList(it) })
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
@@ -92,13 +93,15 @@ class UsersListFragment :
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        viewModel.onQueryChanged(query)
         searchView.clearFocus()
+        usersListAdapter.submitList(null)
+        users_recycler_view.scrollToPosition(0)
+        viewModel.onQueryChanged(query)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        if (query.isEmpty()) viewModel.onQueryChanged(query)
+       // if (query.isEmpty()) viewModel.onQueryChanged(query)
         return true
     }
 

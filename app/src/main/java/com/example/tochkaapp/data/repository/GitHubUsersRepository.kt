@@ -1,6 +1,8 @@
 package com.example.tochkaapp.data.repository
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagedList
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.data.repository.factory.UsersDataSourcesFactory
@@ -19,9 +21,15 @@ class GitHubUsersRepository(
     override val loadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
     override val initialLoadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
 
-    override fun getUsers(query: String?) =
-        if (query.isNullOrEmpty()) getAllUsers() else searchUsers(query)
+    private val usersData = MutableLiveData<PagedList<User>>()
 
+    override fun getUsers(query: String?): LiveData<PagedList<User>> {
+        if (query.isNullOrEmpty()) {
+            usersData.postValue(getAllUsers())
+        } else usersData.postValue(searchUsers(query))
+
+        return usersData
+    }
 
     private fun getAllUsers(): PagedList<User> {
         clear()

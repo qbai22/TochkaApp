@@ -1,5 +1,6 @@
 package com.example.tochkaapp.data.repository
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import com.example.tochkaapp.data.model.User
 
@@ -9,6 +10,6 @@ import com.example.tochkaapp.data.model.User
 interface UsersRepository : Closable,
     Loadable {
 
-    fun getUsers(query: String?): PagedList<User>
+    fun getUsers(query: String?): LiveData<PagedList<User>>
 
 }

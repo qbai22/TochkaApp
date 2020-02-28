@@ -61,6 +61,7 @@ class GithubSearchedUsersDataSource(
                 .subscribe({ users ->
                     // clear retry since last request succeeded
                     setRetry(null)
+                    Log.e(TAG, "users loaded size = ${users.size}")
                     this.loadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users, 0)
                 }, { throwable ->
@@ -73,6 +74,7 @@ class GithubSearchedUsersDataSource(
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<User>) {
         loadingState.postValue(LoadingState.LOADING)
+        Log.e(TAG, "load range called")
         compositeDisposable.add(
             githubApi.searchUsers(query, lastRequestedPage, SIZE_PER_PAGE)
                 .map { mapper.mapUsers(it) }

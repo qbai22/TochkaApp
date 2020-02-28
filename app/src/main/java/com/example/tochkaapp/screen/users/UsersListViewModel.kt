@@ -22,22 +22,14 @@ class UsersListViewModel : ViewModel() {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
     }
 
-    val queryLiveData = MutableLiveData<String>()
-
-    private val _usersData: MutableLiveData<PagedList<User>> = MutableLiveData()
-    val users: LiveData<PagedList<User>> = _usersData
-
+    val users: LiveData<PagedList<User>> = repository.getUsers(null)
     val loadingState: LiveData<LoadingState> = repository.loadingState
 
     fun onQueryChanged(queryString: String) {
-        _usersData.value = repository.getUsers(queryString)
+        repository.getUsers(queryString)
     }
 
     fun retry() {}
-
-    fun init(){
-        _usersData.value = repository.getUsers(query = null)
-    }
 
     override fun onCleared() {
         super.onCleared()

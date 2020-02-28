@@ -25,9 +25,7 @@ class GithubAllUsersDataSource(
     override val initialLoadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()
-
-    private var lastRequestedPage = 0
-
+    private var lastUserId = 0L
     // Keep Completable reference for the retry event
     private var retryCompletable: Completable? = null
 
@@ -48,15 +46,14 @@ class GithubAllUsersDataSource(
 
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<User>) {
         loadingState.postValue(LoadingState.LOADING)
-        val since = calculateLastUserId()
         Log.e(TAG, "load initial called")
         compositeDisposable.add(
-            githubApi.getUsers(since, SIZE_PER_PAGE)
+            githubApi.getUsers(lastUserId, params.pageSize)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map { mapper.mapUsers(it) }
+                .doOnSuccess { lastUserId = it.last().id }
                 .subscribe({ users ->
-                    // clear retry since last request succeeded
                     setRetry(null)
                     loadingState.postValue(LoadingState.LOADED)
                     Log.e(TAG, "USERS DOWNLOADED SIZE = ${users.size}")
@@ -71,14 +68,13 @@ class GithubAllUsersDataSource(
 
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<User>) {
         loadingState.postValue(LoadingState.LOADING)
-        val since = calculateLastUserId()
         compositeDisposable.add(
-            githubApi.getUsers(since, SIZE_PER_PAGE)
+            githubApi.getUsers(lastUserId, params.loadSize)
                 .map { mapper.mapUsers(it) }
+                .doOnSuccess { lastUserId = it.last().id }
                 .subscribe({ users ->
                     setRetry(null)
                     loadingState.postValue(LoadingState.LOADED)
-                    lastRequestedPage++
                     callback.onResult(users)
                 }, { throwable ->
                     setRetry(Action { loadRange(params, callback) })
@@ -95,11 +91,8 @@ class GithubAllUsersDataSource(
         }
     }
 
-    private fun calculateLastUserId(): Long = (lastRequestedPage * SIZE_PER_PAGE).toLong() + 1
-
     companion object {
         private const val TAG = "ALL_USERS_SOURCE"
-        private const val SIZE_PER_PAGE = 30
     }
 
 }
