@@ -52,16 +52,18 @@ class GithubAllUsersDataSource(
         Log.e(TAG, "load initial called")
         compositeDisposable.add(
             githubApi.getUsers(since, SIZE_PER_PAGE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .map { mapper.mapUsers(it) }
                 .subscribe({ users ->
                     // clear retry since last request succeeded
                     setRetry(null)
                     loadingState.postValue(LoadingState.LOADED)
+                    Log.e(TAG, "USERS DOWNLOADED SIZE = ${users.size}")
                     callback.onResult(users, 0)
                 }, { throwable ->
                     // keep a Completable for future retry
                     setRetry(Action { loadInitial(params, callback) })
-                    // publish the error
                     loadingState.postValue(LoadingState.error(throwable.message))
                 })
         )

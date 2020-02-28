@@ -54,6 +54,8 @@ class GithubSearchedUsersDataSource(
         Log.e(TAG, "load initial called")
         compositeDisposable.add(
             githubApi.searchUsers(query, lastRequestedPage, SIZE_PER_PAGE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .map { mapper.mapUsers(it) }
                 .doOnError { Log.e(TAG, "load initial error occured ${it.message}") }
                 .subscribe({ users ->

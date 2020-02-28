@@ -49,6 +49,8 @@ class GitHubUsersRepository(
     private fun setupConfig() =
         PagedList.Config.Builder()
             .setEnablePlaceholders(false)
+            .setInitialLoadSizeHint(PAGE_SIZE)
+            .setPageSize(PAGE_SIZE)
             .build()
 
 
@@ -62,5 +64,6 @@ class GitHubUsersRepository(
 
     companion object {
         private const val TAG = "GIT_HUB_REPO"
+        private const val PAGE_SIZE = 30
     }
 }

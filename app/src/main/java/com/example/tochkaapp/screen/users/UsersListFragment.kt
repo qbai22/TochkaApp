@@ -69,7 +69,7 @@ class UsersListFragment :
         super.onActivityCreated(savedInstanceState)
         binding.lifecycleOwner = this.viewLifecycleOwner
         viewModel.init()
-        startInitialObserve()
+        viewModel.users.observe(this, Observer { usersListAdapter.submitList(it) })
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
             Log.e(TAG, it.toString())
@@ -93,33 +93,15 @@ class UsersListFragment :
 
     override fun onQueryTextSubmit(query: String): Boolean {
         viewModel.onQueryChanged(query)
-        startSearchObserve()
         searchView.clearFocus()
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        if (query.isEmpty()) startObserveAll()
+        if (query.isEmpty()) viewModel.onQueryChanged(query)
         return true
     }
 
-    //we do need a separate case to properly work around of fragment being destroyed
-    private fun startInitialObserve() {
-        if (viewModel.queryLiveData.value.isNullOrBlank())
-            viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-        else viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-    }
-
-    private fun startSearchObserve() {
-        viewModel.allUsers.removeObservers(this)
-        viewModel.searchedUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-    }
-
-    private fun startObserveAll() {
-        viewModel.searchedUsers.removeObservers(this)
-        if (!viewModel.allUsers.hasObservers())
-            viewModel.allUsers.observe(this, Observer { usersListAdapter.submitList(it) })
-    }
 
     override fun navigate(user: User, binding: ItemUserBinding) {
         val action = UsersListFragmentDirections.actionRepositoriesFragmentToDetailsFragment(user)
