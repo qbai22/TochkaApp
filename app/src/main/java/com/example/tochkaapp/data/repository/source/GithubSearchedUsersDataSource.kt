@@ -22,11 +22,10 @@ class GithubSearchedUsersDataSource(
     private val query: String
 ) : RepeatableDataSource<User>() {
 
-    // keep the last requested page. When the request is successful, increment the page number.
-    private var lastRequestedPage = 1
-
     override val loadingState = MutableLiveData<LoadingState>()
 
+    // keep the last requested page. When the request is successful, increment the page number.
+    private var lastRequestedPage = 1
     private val compositeDisposable = CompositeDisposable()
 
     // keep Completable reference for the repeat call

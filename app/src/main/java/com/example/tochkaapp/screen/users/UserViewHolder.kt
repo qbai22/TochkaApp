@@ -24,9 +24,11 @@ internal class UserViewHolder private constructor(
             viewModel = userListViewModel
             this.user = user
         }
-        binding.root.user_avatar_image_view.transitionName = user.avatarUrl
-        binding.root.user_name_text_view.transitionName = user.name
-        binding.root.setOnClickListener { navigationListener.navigate(user, binding) }
+        binding.root.apply{
+            user_avatar_image_view.transitionName = user.avatarUrl
+            user_name_text_view.transitionName = user.name
+            setOnClickListener { navigationListener.navigate(user, binding) }
+        }
         Glide.with(binding.root)
             .load(user.avatarUrl)
             .apply(RequestOptions.circleCropTransform())

@@ -1,10 +1,13 @@
 <resources>
 
-    <!-- Default screen margins, per the Android Design guidelines. -->
+    <!-- margins -->
     <dimen name="default_small_margin">12dp</dimen>
     <dimen name="default_medium_margin">24dp</dimen>
     <dimen name="default_large_margin">48dp</dimen>
 
+    <!-- padding -->
+    <dimen name="user_item_padding">24dp</dimen>
+    <dimen name="item_load_padding">12dp</dimen>
 
     <!-- images -->
     <dimen name="small_avatar_height">72dp</dimen>
@@ -19,5 +22,7 @@
     <!-- cardview -->
     <dimen name="item_card_view_corner_radius">12dp</dimen>
     <dimen name="details_card_height">128dp</dimen>
+
+
 
 </resources>

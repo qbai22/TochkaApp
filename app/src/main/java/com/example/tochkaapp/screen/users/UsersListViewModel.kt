@@ -1,6 +1,5 @@
 package com.example.tochkaapp.screen.users
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
@@ -23,21 +22,17 @@ class UsersListViewModel : ViewModel() {
     lateinit var repository: UsersRepository
 
     private val queryDisp: Disposable
-    //subject to react on query change with delay
+    //subject to react on query change with a delay
     private val querySubject = PublishSubject.create<String>()
 
     init {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
 
-        queryDisp = querySubject.debounce(400, TimeUnit.MILLISECONDS)
+        queryDisp = querySubject
+            .debounce(400, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {
-                Log.e(TAG, "on next called value is $it")
-                repository.loadUsers(it)
-
-            }
-            .subscribe { }
+            .subscribe { repository.loadUsers(it) }
     }
 
     val users: LiveData<PagedList<User>> = repository.loadUsers(null)
@@ -49,7 +44,7 @@ class UsersListViewModel : ViewModel() {
     }
 
     fun onQueryChanged(query: String) {
-        querySubject.onNext(query)
+        querySubject.onNext(query.trim())
     }
 
     fun retry() {

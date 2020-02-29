@@ -60,6 +60,7 @@ class UsersListFragment :
                     startPostponedEnterTransition()
                     true
                 }
+                addItemDecoration(UsersItemDecoration(context))
             }
         }
 
@@ -70,7 +71,11 @@ class UsersListFragment :
         super.onActivityCreated(savedInstanceState)
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        viewModel.users.observe(this, Observer { usersListAdapter.submitList(it) })
+        viewModel.users.observe(this, Observer {
+            //todo show empty screen if no users loaded
+            usersListAdapter.submitList(it)
+        }
+        )
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
             Log.e(TAG, it.toString())
@@ -86,6 +91,7 @@ class UsersListFragment :
 
     private fun setupSearchView(searchView: SearchView) {
         searchView.apply {
+            setQuery(null, true)
             setOnQueryTextListener(this@UsersListFragment)
             queryHint = getString(R.string.search_hint)
             maxWidth = Integer.MAX_VALUE
@@ -98,7 +104,6 @@ class UsersListFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        usersListAdapter.submitList(null)
         users_recycler_view.scrollToPosition(0)
         viewModel.onQueryChanged(query)
         return true

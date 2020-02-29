@@ -59,15 +59,14 @@ internal class UsersAdapter(
 
 
     fun setNetworkState(newLoadingState: LoadingState?) {
-        val previousState = this.loadingState
+        val previousState = loadingState
         val hadExtraRow = hasExtraRow()
-        this.loadingState = newLoadingState
+        loadingState = newLoadingState
         val hasExtraRow = hasExtraRow()
         if (hadExtraRow != hasExtraRow)
 
             if (hadExtraRow) notifyItemRemoved(itemCount)
             else notifyItemInserted(itemCount)
-
         else if (hasExtraRow && previousState != newLoadingState) notifyItemChanged(itemCount - 1)
     }
 
