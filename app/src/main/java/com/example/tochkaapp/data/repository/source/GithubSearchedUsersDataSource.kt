@@ -26,7 +26,6 @@ class GithubSearchedUsersDataSource(
     private var lastRequestedPage = 1
 
     override val loadingState = MutableLiveData<LoadingState>()
-    override val initialLoadingState = MutableLiveData<LoadingState>()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -92,10 +91,8 @@ class GithubSearchedUsersDataSource(
 
 
     private fun setRepeat(action: Action?) {
-        repeatCompletable = if (action == null)
-            null
-        else
-            Completable.fromAction(action)
+        repeatCompletable = if (action == null) null
+        else Completable.fromAction(action)
     }
 
     companion object {

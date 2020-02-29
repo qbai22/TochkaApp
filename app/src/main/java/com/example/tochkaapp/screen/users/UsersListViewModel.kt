@@ -7,6 +7,7 @@ import com.example.tochkaapp.UsersApp
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.data.repository.UsersRepository
 import com.example.tochkaapp.utils.LoadingState
+import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 /**
@@ -21,6 +22,7 @@ class UsersListViewModel : ViewModel() {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
     }
 
+    private val querySubject = PublishSubject.create<String>()
     val users: LiveData<PagedList<User>> = repository.loadUsers(null)
     val loadingState: LiveData<LoadingState> = repository.loadingState
 

@@ -20,7 +20,6 @@ class GitHubUsersRepository(
 ) : UsersRepository {
 
     override val loadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
-    override val initialLoadingState: MediatorLiveData<LoadingState> = MediatorLiveData()
 
     private val usersData = MutableLiveData<PagedList<User>>()
     private lateinit var currentDataSource: RepeatableDataSource<User>

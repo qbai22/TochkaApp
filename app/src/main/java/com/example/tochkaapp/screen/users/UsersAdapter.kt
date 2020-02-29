@@ -49,43 +49,26 @@ internal class UsersAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (hasExtraRow() && position == itemCount - 1) {
-            R.layout.item_loading_state
-        } else {
-            R.layout.item_user
-        }
+        return if (hasExtraRow() && position == itemCount - 1) R.layout.item_loading_state
+        else R.layout.item_user
     }
 
     override fun getItemCount(): Int {
         return super.getItemCount() + if (hasExtraRow()) 1 else 0
     }
 
-    /**
-     * Set the current network state to the adapter
-     * but this work only after the initial load
-     * and the adapter already have list to add new loading raw to it
-     * so the initial loading state the activity responsible for handle it
-     *
-     * @param newLoadingState the new network state
-     */
+
     fun setNetworkState(newLoadingState: LoadingState?) {
-        if (currentList != null) {
-            if (currentList!!.size != 0) {
-                val previousState = this.loadingState
-                val hadExtraRow = hasExtraRow()
-                this.loadingState = newLoadingState
-                val hasExtraRow = hasExtraRow()
-                if (hadExtraRow != hasExtraRow) {
-                    if (hadExtraRow) {
-                        notifyItemRemoved(super.getItemCount())
-                    } else {
-                        notifyItemInserted(super.getItemCount())
-                    }
-                } else if (hasExtraRow && previousState !== newLoadingState) {
-                    notifyItemChanged(itemCount - 1)
-                }
-            }
-        }
+        val previousState = this.loadingState
+        val hadExtraRow = hasExtraRow()
+        this.loadingState = newLoadingState
+        val hasExtraRow = hasExtraRow()
+        if (hadExtraRow != hasExtraRow)
+
+            if (hadExtraRow) notifyItemRemoved(itemCount)
+            else notifyItemInserted(itemCount)
+
+        else if (hasExtraRow && previousState != newLoadingState) notifyItemChanged(itemCount - 1)
     }
 
     companion object {

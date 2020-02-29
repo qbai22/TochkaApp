@@ -12,6 +12,5 @@ import com.example.tochkaapp.utils.LoadingState
 interface Loadable {
 
     val loadingState: LiveData<LoadingState>
-    val initialLoadingState: LiveData<LoadingState>
 
 }

@@ -22,7 +22,6 @@ class GithubAllUsersDataSource(
 ) : RepeatableDataSource<User>() {
 
     override val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
-    override val initialLoadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()
     private var lastUserId = 0L
