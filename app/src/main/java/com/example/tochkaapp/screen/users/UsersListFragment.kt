@@ -94,17 +94,15 @@ class UsersListFragment :
 
     override fun onQueryTextSubmit(query: String): Boolean {
         searchView.clearFocus()
+        return true
+    }
+
+    override fun onQueryTextChange(query: String): Boolean {
         usersListAdapter.submitList(null)
         users_recycler_view.scrollToPosition(0)
         viewModel.onQueryChanged(query)
         return true
     }
-
-    override fun onQueryTextChange(query: String): Boolean {
-       // if (query.isEmpty()) viewModel.onQueryChanged(query)
-        return true
-    }
-
 
     override fun navigate(user: User, binding: ItemUserBinding) {
         val action = UsersListFragmentDirections.actionRepositoriesFragmentToDetailsFragment(user)
