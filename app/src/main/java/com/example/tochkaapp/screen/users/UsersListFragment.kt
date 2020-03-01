@@ -1,17 +1,19 @@
 package com.example.tochkaapp.screen.users
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.tochkaapp.R
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentUsersListBinding
 import com.example.tochkaapp.databinding.ItemUserBinding
@@ -24,26 +26,19 @@ import kotlinx.android.synthetic.main.item_user.view.*
  */
 class UsersListFragment :
     Fragment(),
-    SearchView.OnQueryTextListener,
-    UsersAdapter.UserItemNavigationListener {
+    UsersAdapter.UserItemNavigationListener,
+    TextWatcher {
 
     private lateinit var viewModel: UsersListViewModel
     private lateinit var binding: FragmentUsersListBinding
 
     private lateinit var usersListAdapter: UsersAdapter
 
-    private lateinit var searchView: SearchView
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(false)
-            setDisplayShowTitleEnabled(true)
-        }
 
         setHasOptionsMenu(true)
         viewModel = ViewModelProviders.of(this).get(UsersListViewModel::class.java)
@@ -85,40 +80,23 @@ class UsersListFragment :
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_contact_list, menu)
-        val searchItem = menu.findItem(R.id.search_item)
-        searchView = searchItem.actionView as SearchView
-
-        setupSearchView(searchView, searchItem)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupSearch()
     }
 
-    //SearchView это мýка :)
-    private fun setupSearchView(searchView: SearchView, searchMenuItem: MenuItem) {
-        searchView.apply {
-            setOnQueryTextListener(this@UsersListFragment)
-            queryHint = getString(R.string.search_hint)
-            maxWidth = Integer.MAX_VALUE
-        }
-        val lastQuery = viewModel.getLastQuery()
-        lastQuery?.let {
-            if (it.isNotEmpty()) {
-                searchMenuItem.expandActionView()
-                searchView.setQuery(lastQuery, false)
-                searchView.clearFocus()
-            }
-        }
+    private fun setupSearch() {
+        search_edit_text.addTextChangedListener(this)
+        search_edit_text.text = null
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        searchView.clearFocus()
-        return true
-    }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        Log.e(TAG, "on_query_change called ёбаный блять в рот и значение у него нахуй $query")
-        viewModel.onQueryChanged(query)
-        return true
+    override fun afterTextChanged(s: Editable?) {}
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        Log.e(TAG, "on_query_change called ёбаный блять в рот и значение у него нахуй $s")
+        viewModel.onQueryChanged(s.toString())
     }
 
     override fun navigate(user: User, binding: ItemUserBinding) {

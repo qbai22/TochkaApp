@@ -9,6 +9,7 @@
     <color name="main_background">#FFFFFF</color>
 
     <color name="google_red_color">#DD4B39</color>
-
+    <color name="opaque_background">#1A000000</color>
+    <color name="opaque_text">#40000000</color>
 
 </resources>
