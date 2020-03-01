@@ -15,6 +15,7 @@ import com.example.tochkaapp.R
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentUsersListBinding
 import com.example.tochkaapp.databinding.ItemUserBinding
+import com.example.tochkaapp.utils.State
 import kotlinx.android.synthetic.main.fragment_users_list.*
 import kotlinx.android.synthetic.main.item_user.view.*
 
@@ -55,6 +56,7 @@ class UsersListFragment :
             usersRecyclerView.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 adapter = usersListAdapter
+                //required to play transition animations back to this destination
                 postponeEnterTransition()
                 viewTreeObserver.addOnPreDrawListener {
                     startPostponedEnterTransition()
@@ -72,13 +74,14 @@ class UsersListFragment :
         binding.lifecycleOwner = this.viewLifecycleOwner
 
         viewModel.users.observe(this, Observer {
-            //todo show empty screen if no users loaded
             usersListAdapter.submitList(it)
         }
         )
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
-            Log.e(TAG, it.toString())
+            if (it.state == State.LOADED && usersListAdapter.itemCount == 0)
+                empty_list_text_view.visibility = View.VISIBLE
+            else empty_list_text_view.visibility = View.GONE
         })
     }
 
@@ -86,15 +89,24 @@ class UsersListFragment :
         inflater.inflate(R.menu.menu_contact_list, menu)
         val searchItem = menu.findItem(R.id.search_item)
         searchView = searchItem.actionView as SearchView
-        setupSearchView(searchView)
+
+        setupSearchView(searchView, searchItem)
     }
 
-    private fun setupSearchView(searchView: SearchView) {
+    //SearchView это мýка :)
+    private fun setupSearchView(searchView: SearchView, searchMenuItem: MenuItem) {
         searchView.apply {
-            setQuery(null, true)
             setOnQueryTextListener(this@UsersListFragment)
             queryHint = getString(R.string.search_hint)
             maxWidth = Integer.MAX_VALUE
+        }
+        val lastQuery = viewModel.getLastQuery()
+        lastQuery?.let {
+            if (it.isNotEmpty()) {
+                searchMenuItem.expandActionView()
+                searchView.setQuery(lastQuery, false)
+                searchView.clearFocus()
+            }
         }
     }
 
@@ -104,7 +116,7 @@ class UsersListFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        users_recycler_view.scrollToPosition(0)
+        Log.e(TAG, "on_query_change called ёбаный блять в рот и значение у него нахуй $query")
         viewModel.onQueryChanged(query)
         return true
     }

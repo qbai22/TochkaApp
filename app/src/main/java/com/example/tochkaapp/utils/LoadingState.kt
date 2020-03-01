@@ -6,7 +6,7 @@ package com.example.tochkaapp.utils
 
 enum class State {
     LOADING,
-    SUCCESS,
+    LOADED,
     FAILED
 }
 
@@ -19,7 +19,7 @@ data class LoadingState private constructor(
     companion object {
 
         val LOADING = LoadingState(State.LOADING)
-        val LOADED = LoadingState(State.SUCCESS)
+        val LOADED = LoadingState(State.LOADED)
         fun error(msg: String?) = LoadingState(State.FAILED, msg)
 
     }

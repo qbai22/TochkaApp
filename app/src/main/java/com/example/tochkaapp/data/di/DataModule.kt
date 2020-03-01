@@ -40,5 +40,4 @@ class DataModule {
     fun provideRepository(usersDataSourceFactory: UsersDataSourcesFactory): UsersRepository =
         GitHubUsersRepository(usersDataSourceFactory)
 
-
 }
