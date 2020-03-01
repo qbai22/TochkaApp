@@ -3,11 +3,9 @@ package com.example.tochkaapp.screen.users
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tochkaapp.data.model.User
 import com.example.tochkaapp.databinding.FragmentUsersListBinding
 import com.example.tochkaapp.databinding.ItemUserBinding
-import com.example.tochkaapp.utils.State
 import kotlinx.android.synthetic.main.fragment_users_list.*
 import kotlinx.android.synthetic.main.item_user.view.*
 
@@ -74,9 +71,6 @@ class UsersListFragment :
         )
         viewModel.loadingState.observe(this, Observer {
             usersListAdapter.setNetworkState(it)
-            if (it.state == State.LOADED && usersListAdapter.itemCount == 0)
-                empty_list_text_view.visibility = View.VISIBLE
-            else empty_list_text_view.visibility = View.GONE
         })
     }
 
@@ -87,15 +81,14 @@ class UsersListFragment :
 
     private fun setupSearch() {
         search_edit_text.addTextChangedListener(this)
+        //setting up value for initial load
         search_edit_text.text = null
     }
-
 
     override fun afterTextChanged(s: Editable?) {}
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        Log.e(TAG, "on_query_change called ёбаный блять в рот и значение у него нахуй $s")
         viewModel.onQueryChanged(s.toString())
     }
 

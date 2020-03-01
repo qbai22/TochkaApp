@@ -11,6 +11,11 @@ import retrofit2.http.Query
  */
 interface GithubApi {
 
+    /*
+    * since we Github api doesn't support empty query for search
+    * we need a separate call to get all users by their id's
+    */
+
     @GET("/users?")
     fun getUsers(
         @Query("since") userId: Long,

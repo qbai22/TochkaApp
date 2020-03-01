@@ -24,7 +24,7 @@ class UsersListViewModel : ViewModel() {
     @Inject
     lateinit var repository: UsersRepository
 
-    private val queryDisp: Disposable
+    private val queryDisposable: Disposable
 
     //subject to react on query change with a delay
     private val querySubject = PublishSubject.create<String>()
@@ -35,7 +35,7 @@ class UsersListViewModel : ViewModel() {
     init {
         UsersApp.instance.getDataComponent().inject(this@UsersListViewModel)
 
-        queryDisp = querySubject
+        queryDisposable = querySubject
             .debounce(400, TimeUnit.MILLISECONDS)
             .doOnNext { Log.e(TAG,"subject onNext value = $it") }
             .distinctUntilChanged()
@@ -52,12 +52,10 @@ class UsersListViewModel : ViewModel() {
 
     fun retry() = repository.retryLoad()
 
-    fun getLastQuery() = queryLiveData.value
-
     override fun onCleared() {
         super.onCleared()
         repository.close()
-        queryDisp.dispose()
+        queryDisposable.dispose()
     }
 
     companion object {
