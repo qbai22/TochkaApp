@@ -14,7 +14,6 @@
         <variable
             name="loading_state"
             type="com.example.tochkaapp.utils.LoadingState" />
-
     </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/default_small_margin"
             android:text='@{loading_state.message ?? ""}'
             android:visibility="@{loading_state.message != null ? View.VISIBLE : View.GONE}" />
 
@@ -41,12 +41,16 @@
 
         <Button
             android:id="@+id/retryButton"
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/search_edit_text_height"
             android:layout_gravity="center"
+            android:width="@dimen/retry_button_width"
+            android:background="@drawable/search_background"
             android:onClick="@{() -> view_model.retry()}"
             android:text="@string/retry"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/small_text"
             android:visibility="@{loading_state.state == State.FAILED ? View.VISIBLE : View.GONE}" />
 
     </LinearLayout>

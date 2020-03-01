@@ -20,7 +20,7 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/search_edit_text_height"
             android:layout_marginStart="@dimen/default_small_margin"
             android:layout_marginTop="@dimen/default_small_margin"
             android:layout_marginEnd="@dimen/default_small_margin"
@@ -35,12 +35,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Enter the room name..." />
+            tools:text="Enter query..." />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/users_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_edit_text" />
