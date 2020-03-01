@@ -35,7 +35,7 @@ class UsersItemDecoration(
 
 
     companion object {
-        private const val ITEM_SPACING_DP = 12
+        private const val ITEM_SPACING_DP = 8
     }
 
 }
