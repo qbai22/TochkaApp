@@ -59,6 +59,7 @@ class GithubSearchedUsersDataSource(
                 .subscribe({ users ->
                     //we don't need to repeat after successful call
                     setRepeat(null)
+                    lastRequestedPage++
                     Log.e(TAG, "users loaded size = ${users.size}")
                     this.loadingState.postValue(LoadingState.LOADED)
                     callback.onResult(users, 0)

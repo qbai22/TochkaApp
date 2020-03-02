@@ -1,5 +1,6 @@
 package com.example.tochkaapp.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -27,7 +28,11 @@ class GitHubUsersRepository(
     override fun loadUsers(query: String?): LiveData<PagedList<User>> {
 
         if (query.isNullOrEmpty()) usersData.postValue(getAllUsers())
-        else usersData.postValue(searchUsers(query))
+        else {
+            val list = searchUsers(query)
+            Log.e(TAG, "loading list size = ${list.size}")
+            usersData.postValue(list)
+        }
 
         return usersData
     }
